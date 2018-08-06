@@ -43,12 +43,12 @@ class Login extends Component {
   login() {
     console.log("logging in...")
     this.props.actions.login(this.state.email, this.state.password)
-    // TODO: login action
   }
 
   register() {
     console.log("registering...")
-    // TODO: register action
+    this.props.actions.register(this.state.email, this.state.password)
+    // TODO: new modal for registration to confirm password and other requirements...
   }
 
   render() {

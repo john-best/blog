@@ -12,6 +12,15 @@ export const rootReducer = (state = initialState, action) => {
     case types.LOGIN_FAILURE:
       return state.merge({ logging_in: false, error: action.error });
 
+    case types.REGISTER_REQUEST:
+      return state.merge({ registering: true });
+
+    case types.REGISTER_SUCCESS:
+      return state.merge({ registering: false, logged_in: true });
+
+    case types.REGISTER_FAILURE:
+      return state.merge({ registering: false, error: action.error });
+
     default:
       return state;
   }
