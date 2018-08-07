@@ -2,6 +2,8 @@ import * as types from "./actionTypes";
 import firebase from "../server/firebase";
 import "firebase/auth";
 
+import history from "../history";
+
 export const authActions = { login, register };
 
 let auth = firebase.auth();
@@ -9,15 +11,13 @@ let auth = firebase.auth();
 function login(email, password) {
   return dispatch => {
     dispatch(request());
-    console.log("TODO: handle login request");
 
-    // firebase stuff here
     auth
       .signInWithEmailAndPassword(email, password)
       .then(result => {
         console.log(result);
         dispatch(success());
-        // TODO: what happens when success?
+        history.push("/")
       })
       .catch(error => {
         console.log(error);
@@ -40,6 +40,8 @@ function login(email, password) {
 
 function register(email, password) {
   return dispatch => {
+
+    dispatch(request());
     auth
       .createUserWithEmailAndPassword(email, password)
       .then(result => {
@@ -47,7 +49,7 @@ function register(email, password) {
         dispatch(success());
       })
       .catch(error => {
-          console.log(error);
+        console.log(error);
         dispatch(failure(error));
       });
   };
