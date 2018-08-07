@@ -1,11 +1,21 @@
-import React, { Component } from 'react';
-import './App.css';
+import React, { Component } from "react";
+import { Route, Router, Switch } from "react-router";
+
+import Home from "./Home";
+import Login from "./Login";
+
+import history from "../history";
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-        {this.props.routes}
+        <Router history={history}>
+          <Switch>
+            <Route exact path="/" component={Home} />
+            <Route exact path="/login" component={Login} />
+          </Switch>
+        </Router>
       </div>
     );
   }
