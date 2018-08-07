@@ -3,6 +3,7 @@ import { Route, Router, Switch } from "react-router";
 
 import Home from "./Home";
 import Login from "./Login";
+import NewPost from "./NewPost";
 
 import history from "../history";
 
@@ -14,6 +15,7 @@ class App extends Component {
           <Switch>
             <Route exact path="/" component={Home} />
             <Route exact path="/login" component={Login} />
+            <Route exact path="/newpost" component={NewPost} />
           </Switch>
         </Router>
       </div>

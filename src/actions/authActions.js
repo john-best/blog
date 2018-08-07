@@ -15,12 +15,10 @@ function login(email, password) {
     auth
       .signInWithEmailAndPassword(email, password)
       .then(result => {
-        console.log(result);
         dispatch(success());
         history.push("/")
       })
       .catch(error => {
-        console.log(error);
         dispatch(failure(error));
       });
   };
@@ -45,11 +43,9 @@ function register(email, password) {
     auth
       .createUserWithEmailAndPassword(email, password)
       .then(result => {
-        console.log(result);
         dispatch(success());
       })
       .catch(error => {
-        console.log(error);
         dispatch(failure(error));
       });
   };
