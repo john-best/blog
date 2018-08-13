@@ -4,29 +4,33 @@ import { bindActionCreators } from "redux";
 import { blogActions } from "../actions/blogActions";
 import { connect } from "react-redux";
 import { withRouter } from "react-router";
-import { Button, Card, CardBody } from "reactstrap";
+import {
+  Button,
+  Card,
+  CardBody,
+  Input,
+  FormGroup,
+  Label,
+  ModalHeader,
+  Modal,
+  ModalBody,
+  ModalFooter
+} from "reactstrap";
 
-let fakedata = {
-  blogs: [
-    {
-      blog_name: "John's Blog",
-      link: "/john_blog",
-      blog_posts: []
-    },
-    {
-      blog_name: "Test blog",
-      link: "/test"
-    }
-  ]
-};
 class Home extends Component {
   constructor() {
     super();
 
-    this.create_blog = this.create_blog.bind(this);
-  }
+    this.state = {
+      modal: false,
+      blog_link: "",
+      blog_name: ""
+    };
 
-  componentWillMount() {
+    this.create_blog = this.create_blog.bind(this);
+    this.toggle = this.toggle.bind(this);
+    this.changeEvent = this.changeEvent.bind(this);
+
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.setState({ user: user });
@@ -37,22 +41,81 @@ class Home extends Component {
     });
   }
 
+  static getDerivedStateFromProps(props, state) {
+    if (props.blogs !== state.blogs) return { blogs: props.blogs };
+    return null;
+}
+
   create_blog() {
-    this.props.actions.new_blog("blog_link", "blog title");
+    this.props.actions.new_blog(this.state.blog_link, this.state.blog_name);
+    this.toggle();
+  }
+
+  toggle() {
+    this.setState({
+      modal: !this.state.modal
+    });
+  }
+
+  changeEvent(e) {
+    this.setState({ [e.target.name]: e.target.value });
   }
 
   render() {
-
     return (
-      <div name="blogs">
-      { this.props.blogs !== undefined ? this.props.blogs.map((blog, index) => (
-          <Card key={index}>
-              <CardBody>
-                  <h1><a href={blog.blog_link}>{blog.blog_title}</a></h1>
-            </CardBody>
-        </Card>
+      <div>
+        <div name="newBlogModal">
+          <Modal
+            isOpen={this.state.modal}
+            toggle={this.toggle}
+            className={this.props.className}
+          >
+            <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
+            <ModalBody>
+              <FormGroup>
+                <Label for="blog_name">Blog Name</Label>
+                <Input
+                  placeholder="John's Blog"
+                  type="text"
+                  name="blog_name"
+                  onChange={this.changeEvent}
+                />
+              </FormGroup>
+              <FormGroup>
+                <Label for="blog_link">Blog URL</Label>
+                <Input
+                  placeholder="johns_blog"
+                  type="text"
+                  name="blog_link"
+                  onChange={this.changeEvent}
+                />
+              </FormGroup>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="primary" onClick={this.create_blog}>
+                Create Blog
+              </Button>{" "}
+              <Button color="secondary" onClick={this.toggle}>
+                Cancel
+              </Button>
+            </ModalFooter>
+          </Modal>
+        </div>
+        <div name="blogs">
+          {this.props.blogs !== undefined
+            ? this.props.blogs.map((blog, index) => (
+                <Card key={index}>
+                  <CardBody>
+                    <h1>
+                      <a href={blog.blog_link}>{blog.blog_title}</a>
+                    </h1>
+                  </CardBody>
+                </Card>
+              ))
+            : null}
 
-      )) : null}
+          <Button onClick={this.toggle}>Create New Blog</Button>
+        </div>
       </div>
     );
   }
@@ -65,9 +128,9 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state, ownProps) {
-    return {
-        blogs: state.blogReducer.blogs
-    };
+  return {
+    blogs: state.blogReducer.blogs
+  };
 }
 
 const connectedHome = withRouter(
