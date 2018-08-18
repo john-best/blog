@@ -17,11 +17,15 @@ export default (state = initialState, action) => {
 
     case types.GET_BLOGS_SUCCESS:
       return state.merge({
-          blogs: action.blogs
+          blogs: action.blogs,
+          blog_get_success: true
       })
 
     case types.GET_BLOGS_FAILURE:
-      return state;
+      return state.merge({
+        blog_get_success: false,
+        error: action.error
+      });
 
     default:
       return state;

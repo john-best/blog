@@ -16,6 +16,7 @@ import {
   ModalBody,
   ModalFooter
 } from "reactstrap";
+import { authActions } from "../actions/authActions";
 
 class Home extends Component {
   constructor() {
@@ -34,7 +35,7 @@ class Home extends Component {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.setState({ user: user });
-        this.props.actions.get_blogs();
+        this.props.blog_actions.get_blogs();
       } else {
         this.setState({ user: null });
       }
@@ -47,8 +48,8 @@ class Home extends Component {
 }
 
   create_blog() {
-    this.props.actions.new_blog(this.state.blog_link, this.state.blog_name);
-    this.toggle();
+    this.props.blog_actions.new_blog(this.state.blog_link, this.state.blog_name);
+    //this.toggle();
   }
 
   toggle() {
@@ -115,6 +116,7 @@ class Home extends Component {
             : null}
 
           <Button onClick={this.toggle}>Create New Blog</Button>
+          <Button onClick={this.props.auth_actions.logout}>Logout</Button>
         </div>
       </div>
     );
@@ -123,7 +125,8 @@ class Home extends Component {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(blogActions, dispatch)
+    blog_actions: bindActionCreators(blogActions, dispatch),
+    auth_actions: bindActionCreators(authActions, dispatch)
   };
 }
 

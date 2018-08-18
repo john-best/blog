@@ -1,30 +1,37 @@
 import * as types from "./actionTypes";
-import "firebase/database";
+import "firebase/firestore";
 import "firebase/auth";
 import firebase from "../server/firebase";
+import history from "../history";
 
 export const blogActions = { new_blog, get_blogs };
 
-let db = firebase.database();
+let db = firebase.firestore();
 let auth = firebase.auth();
+
 function new_blog(blog_link, blog_title) {
   return dispatch => {
     dispatch(request());
-    var newBlogRef = db
-      .ref("/")
-      .child("blogs")
-      .push();
-    var userid = auth.currentUser.uid;
 
-    newBlogRef
+    // add a new blog to the blog collection
+    // then add the blog link (which is unique key) to the array of blogs for the user
+    // since the blog creation is now finished, push them to the newly created blog page
+    db.collection("blogs")
+      .doc(blog_link)
       .set({
-        blog_link: blog_link,
         blog_title: blog_title,
-        creator: userid
+        creator: auth.currentUser.uid
       })
       .then(result => {
-        console.log(result);
-        dispatch(success());
+        db.collection("users")
+          .doc(auth.currentUser.uid)
+          .update({
+            blogs: firebase.firestore.FieldValue.arrayUnion(blog_link)
+          })
+          .then(result => {
+            dispatch(success());
+            history.push("/" + blog_link);
+          });
       })
       .catch(error => {
         console.log(error);
@@ -49,30 +56,43 @@ function get_blogs() {
   return dispatch => {
     dispatch(request());
 
-    var ref = db.ref("blogs/");
-    var userid = auth.currentUser.uid;
+    let user_ref = db.collection("users").doc(auth.currentUser.uid);
+    let my_blogs = [];
 
-    ref.on(
-      "value",
-      function(snapshot) {
-        let blogs = snapshot.val();
-        let my_blogs = []
+    // grab the array of blog urls from the user
+    // then grab the title from the blog
+    // then combine those for each blog the user has
+    user_ref
+      .get()
+      .then(doc => {
+        if (doc.exists) {
+          let data = doc.data();
+          let promises = [];
 
-        for (var blog in blogs) {
-          if (blogs[blog].creator === userid) {
-              blogs[blog].id = blog
-              my_blogs.push(blogs[blog])
+          for (var i = 0; i < data.blogs.length; i++) {
+            let blog_ref = db.collection("blogs").doc(data.blogs[i]);
+
+            let blog_link = data.blogs[i];
+            promises.push(
+              blog_ref.get().then(doc => {
+                my_blogs.push({
+                  blog_link: blog_link,
+                  blog_title: doc.data().blog_title
+                });
+              })
+            );
           }
-        }
 
-        console.log(my_blogs)
-        dispatch(success(my_blogs))
-      },
-      function(error) {
-        dispatch(failure(error));
+          Promise.all(promises).then(() => {
+            dispatch(success(my_blogs));
+          });
+        } else {
+          console.log("This user could not be found.");
+        }
+      })
+      .catch(error => {
         console.log(error);
-      }
-    );
+      });
   };
 
   function request() {
