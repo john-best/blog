@@ -39,14 +39,11 @@ class NewPost extends Component {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.setState({user: user})
+        this.props.blogActions.check_edit_privs_redirect(user.uid, this.props.match.params.blog_url);
       } else {
         this.props.history.push("/login");
       }
     });
-  }
-
-  componentDidMount() {
-    this.props.blogActions.check_edit_privs_redirect(this.props.match.params.blog_url);
   }
 
   changeEvent(e) {

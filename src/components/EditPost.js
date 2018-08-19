@@ -39,6 +39,8 @@ class EditPost extends Component {
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
           this.setState({user: user})
+          console.log(user)
+          this.props.blogActions.check_edit_privs_redirect(user.uid, this.props.match.params.blog_url);
         } else {
             this.props.history.push("/login");
         }

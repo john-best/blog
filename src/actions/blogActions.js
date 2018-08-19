@@ -155,23 +155,15 @@ function check_edit_privs(blog_id) {
   }
 }
 
-function check_edit_privs_redirect(blog_id) {
+function check_edit_privs_redirect(user_id, blog_id) {
   return dispatch => {
     dispatch(request())
 
-    
-    if (auth.currentUser === null) {
-      dispatch(success(false));
-      history.push("/");
-      return;
-    }
-    let user_ref = db.collection("users").doc(auth.currentUser.uid);
-    user_ref.get().then(doc => {
+    let blog_ref = db.collection("blogs").doc(blog_id);
+    blog_ref.get().then(doc => {
       let data = doc.data();
 
-      // if blog is within user's created blogs array
-      if (data.blogs.indexOf(blog_id) !== -1) {
-        
+      if (data.creator === user_id) {
         dispatch(success(true));
       } else {
         dispatch(success(false));
