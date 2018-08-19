@@ -4,7 +4,7 @@ import "firebase/auth";
 import firebase from "../server/firebase";
 import history from "../history";
 
-export const blogActions = { new_blog, get_blogs };
+export const blogActions = { new_blog, get_blogs, check_edit_privs };
 
 let db = firebase.firestore();
 let auth = firebase.auth();
@@ -112,5 +112,45 @@ function get_blogs() {
 
   function failure(error) {
     return { type: types.GET_BLOGS_FAILURE, error: error };
+  }
+}
+
+function check_edit_privs(blog_id) {
+  return dispatch => {
+    dispatch(request())
+
+    
+    if (auth.currentUser === null) {
+      dispatch(success(false));
+      return;
+    }
+    let user_ref = db.collection("users").doc(auth.currentUser.uid);
+    user_ref.get().then(doc => {
+      let data = doc.data();
+
+      // if blog is within user's created blogs array
+      if (data.blogs.indexOf(blog_id) !== -1) {
+        dispatch(success(true));
+      } else {
+        dispatch(success(false));
+      }
+
+    }).catch(error => {
+      dispatch(failure(error));
+    })
+
+  }
+
+  function request() {
+    return { type: types.CHECK_EDIT_PRIVS_REQUEST };
+  }
+
+  function success(bool) {
+    return { type: types.CHECK_EDIT_PRIVS_SUCCESS, user_can_edit: bool };
+  }
+
+  function failure(error) {
+    // if there's an error let's just not let them edit
+    return { type: types.CHECK_EDIT_PRIVS_FAILURE, user_can_edit: false, error: error };
   }
 }

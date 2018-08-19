@@ -118,7 +118,6 @@ function get_blog_post(blog_url, post_id) {
       .then(doc => {
         let post = doc.data();
 
-        let returnval = {};
         dispatch(
           success({
             ...post,

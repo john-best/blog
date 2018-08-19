@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { bindActionCreators } from "redux";
 import { postActions } from "../actions/postActions";
+import { blogActions } from "../actions/blogActions";
 import { connect } from "react-redux";
 import { withRouter } from "react-router";
 import { Link } from "react-router-dom";
@@ -13,13 +14,19 @@ class Blog extends Component {
   constructor() {
     super();
 
-    this.state = {}
+    this.state = {};
 
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.setState({ user: user });
+        this.props.blogActions.check_edit_privs(
+          this.props.match.params.blog_url
+        );
       } else {
         this.setState({ user: null });
+        this.props.blogActions.check_edit_privs(
+          this.props.match.params.blog_url
+        );
       }
     });
   }
@@ -30,6 +37,8 @@ class Blog extends Component {
 
   static getDerivedStateFromProps(props, state) {
     if (props.posts !== state.posts) return { posts: props.posts };
+    if (props.user_can_edit !== state.user_can_edit)
+      return { user_can_edit: props.user_can_edit };
     return null;
   }
 
@@ -52,7 +61,9 @@ class Blog extends Component {
                     >
                       <h3>{item.title}</h3>
                     </Link>
-                    <p><i>Posted on {item.posted_at}</i></p>
+                    <p>
+                      <i>Posted on {item.posted_at}</i>
+                    </p>
                   </CardHeader>
                   <CardBody>
                     <div>
@@ -66,32 +77,31 @@ class Blog extends Component {
                 </Card>
               ))}
         </div>
-
-        {this.state.user !== null ? (
-          <div name="buttons">
-            <Link to={"/" + this.props.match.params.blog_url + "/new"}>
-              <Button>New Post</Button>
-            </Link>
-
-            <Link to={"/"}>
-              <Button>Dashboard</Button>
-            </Link>
-          </div>
+        {this.props.user_can_edit === true ? (
+          <Link to={"/" + this.props.match.params.blog_url + "/new"}>
+            <Button>New Post</Button>
+          </Link>
         ) : null}
+        <Link to={"/"}>
+          <Button>Dashboard</Button>
+        </Link>
       </div>
     );
   }
 }
 
 function mapStateToProps(state, ownProps) {
+  console.log(state);
   return {
-    posts: state.postReducer.posts
+    posts: state.postReducer.posts,
+    user_can_edit: state.blogReducer.user_can_edit
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(postActions, dispatch)
+    actions: bindActionCreators(postActions, dispatch),
+    blogActions: bindActionCreators(blogActions, dispatch)
   };
 }
 
