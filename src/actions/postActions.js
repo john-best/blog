@@ -7,7 +7,7 @@ import history from "../history";
 let auth = firebase.auth();
 let db = firebase.firestore();
 
-export const postActions = { new_post, get_blog_posts, get_blog_post };
+export const postActions = { new_post, get_blog_posts, get_blog_post, edit_post };
 
 function new_post(blog_url, title, body) {
   return dispatch => {
@@ -138,4 +138,37 @@ function get_blog_post(blog_url, post_id) {
   function failure(error) {
     return { type: types.GET_POST_FAILURE, error: error };
   }
+}
+
+function edit_post(blog_url, post_id, title, body) {
+  return dispatch => {
+    dispatch(request())
+
+    console.log(post_id);
+    let post_ref = db.collection("posts").doc(post_id);
+    post_ref.update({
+      title: title,
+      body: body,
+      updated_at: firebase.firestore.FieldValue.arrayUnion(post_id)
+    }).then(result => {
+      dispatch(success());
+      history.push("/" + blog_url + "/post/" + post_id);
+    }).catch(error => {
+
+      console.log(error);
+      dispatch(failure(error));
+    })
+  }
+  function request() {
+    return { type: types.EDIT_POST_REQUEST };
+  }
+
+  function success() {
+    return { type: types.EDIT_POST_SUCCESS };
+  }
+
+  function failure(error) {
+    return { type: types.EDIT_POST_FAILURE, error: error };
+  }
+
 }

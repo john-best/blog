@@ -19,45 +19,53 @@ import firebase from "../server/firebase";
 
 import marked from "marked";
 
-class NewPost extends Component {
+class EditPost extends Component {
   constructor() {
     super();
 
     this.state = {
       title: "",
-      content: "",
+      body: "",
       preview: false,
       preview_title: "",
-      preview_content: ""
+      preview_body: ""
     };
 
     this.changeEvent = this.changeEvent.bind(this);
-    this.post = this.post.bind(this);
+    this.edit = this.edit.bind(this);
     this.preview = this.preview.bind(this);
 
     firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        this.setState({user: user})
-      } else {
-        this.props.history.push("/login");
-      }
-    });
+        if (user) {
+          this.setState({user: user})
+        } else {
+            this.props.history.push("/login");
+        }
+      });
   }
 
   componentDidMount() {
-    // TODO: check if user has access to blog to even post
+    this.props.actions.get_blog_post(
+        this.props.match.params.blog_url,
+        this.props.match.params.post_id
+      );
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    if (props.post !== state.post) return { post: props.post, title: props.post.title, body: props.post.body };
+    return null;
   }
 
   changeEvent(e) {
     this.setState({ [e.target.name]: e.target.value });
   }
 
-  post() {
-    this.props.actions.new_post(this.props.match.params.blog_url, this.state.title, this.state.content);
+  edit() {
+    this.props.actions.edit_post(this.props.match.params.blog_url, this.props.match.params.post_id, this.state.title, this.state.body);
   }
 
   preview() {
-      this.setState({preview: true, preview_title: this.state.title, preview_content: this.state.content})
+      this.setState({preview: true, preview_title: this.state.title, preview_body: this.state.body})
   }
 
   render() {
@@ -67,7 +75,7 @@ class NewPost extends Component {
           <FormGroup>
             <Label for="title">Title</Label>
             <Input
-              placeholder=""
+              value={this.state.title}
               name="title"
               id="title"
               type="text"
@@ -75,11 +83,11 @@ class NewPost extends Component {
             />
           </FormGroup>
           <FormGroup>
-            <Label for="content">Body</Label>
+            <Label for="body">Body</Label>
             <Input
-              placeholder=""
-              name="content"
-              id="content"
+              value={this.state.body}
+              name="body"
+              id="body"
               type="textarea"
               onChange={this.changeEvent}
               style={{minHeight: "25em"}}
@@ -87,9 +95,9 @@ class NewPost extends Component {
           </FormGroup>
           <Button
             style={{ marginRight: "0.25%", marginTop: "2%" }}
-            onClick={this.post}
+            onClick={this.edit}
           >
-            Post
+            Save Changes
           </Button>
           <Button
             style={{ marginLeft: "0.25%", marginTop: "2%" }}
@@ -102,7 +110,7 @@ class NewPost extends Component {
             <Card>
             <CardBody>
                 <div>
-                <span dangerouslySetInnerHTML={{ __html: marked(this.state.preview_content, {sanitize: true})}} />
+                <span dangerouslySetInnerHTML={{ __html: marked(this.state.preview_body, {sanitize: true})}} />
                 </div>
                 </CardBody>
             </Card>
@@ -113,16 +121,23 @@ class NewPost extends Component {
   }
 }
 
+function mapStateToProps(state, ownProps) {
+    console.log(state);
+    return {
+      post: state.postReducer.post
+    };
+  }
+
 function mapDispatchToProps(dispatch) {
   return {
     actions: bindActionCreators(postActions, dispatch)
   };
 }
 
-const connectedNewPost = withRouter(
+const connectedEditPost = withRouter(
   connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps
-  )(NewPost)
+  )(EditPost)
 );
-export default connectedNewPost;
+export default connectedEditPost;

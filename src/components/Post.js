@@ -11,7 +11,7 @@ class Post extends Component {
   constructor() {
     super();
 
-    this.state = {}
+    this.state = {};
 
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
@@ -22,7 +22,7 @@ class Post extends Component {
     });
   }
   componentDidMount() {
-    console.log(this.props.match.params);
+    console.log(this.props.match);
     this.props.actions.get_blog_post(
       this.props.match.params.blog_url,
       this.props.match.params.post_id
@@ -64,7 +64,21 @@ class Post extends Component {
           </CardBody>
         </Card>
       ) : null;
-    return <div name="post">{post}</div>;
+    return (
+      <div>
+        <div name="post">{post}</div>
+
+        <Link to={"/" + this.props.match.params.blog_url}>
+          <Button>Blog Main</Button>
+        </Link>
+
+        {this.state.user !== null ? (
+          <Link to={this.props.match.url + "/edit"}>
+            <Button>Edit Post</Button>
+          </Link>
+        ) : null}
+      </div>
+    );
   }
 }
 

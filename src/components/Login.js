@@ -28,9 +28,7 @@ class Login extends Component {
     this.onKeyPress = this.onKeyPress.bind(this);
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
-  }
 
-  componentWillMount() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.props.history.push("/");

@@ -7,6 +7,7 @@ import NewPost from "./NewPost";
 import Blog from "./Blog";
 import history from "../history";
 import Post from "./Post";
+import EditPost from "./EditPost";
 
 class App extends Component {
   render() {
@@ -19,6 +20,7 @@ class App extends Component {
             <Route exact path="/:blog_url/new" component={NewPost} />
             <Route exact path="/:blog_url" component={Blog} />
             <Route exact path="/:blog_url/post/:post_id" component={Post} />
+            <Route exact path="/:blog_url/post/:post_id/edit" component={EditPost} />
           </Switch>
         </Router>
       </div>
