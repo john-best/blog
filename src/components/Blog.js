@@ -5,14 +5,23 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router";
 import { Link } from "react-router-dom";
 
-import { Card, CardHeader, CardBody } from "reactstrap";
+import { Button, Card, CardHeader, CardBody } from "reactstrap";
 import marked from "marked";
+import firebase from "../server/firebase";
 
 class Blog extends Component {
   constructor() {
     super();
 
     this.state = {}
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.setState({ user: user });
+      } else {
+        this.setState({ user: null });
+      }
+    });
   }
 
   componentDidMount() {
@@ -22,19 +31,29 @@ class Blog extends Component {
   static getDerivedStateFromProps(props, state) {
     if (props.posts !== state.posts) return { posts: props.posts };
     return null;
-}
+  }
 
   render() {
-
-    console.log(this.state.posts)
     return (
       <div>
         <div name="posts">
           {this.state.posts === undefined
             ? "Loading..."
             : this.state.posts.map((item, index) => (
-                <Card key={index} style={{marginBottom: "2em"}}>
-                  <CardHeader><Link to={"/" + this.props.match.params.blog_url + "/post/" + item.id}><h3>{item.title}</h3></Link></CardHeader>
+                <Card key={index} style={{ marginBottom: "2em" }}>
+                  <CardHeader>
+                    <Link
+                      to={
+                        "/" +
+                        this.props.match.params.blog_url +
+                        "/post/" +
+                        item.id
+                      }
+                    >
+                      <h3>{item.title}</h3>
+                    </Link>
+                    <p><i>Posted on {item.posted_at}</i></p>
+                  </CardHeader>
                   <CardBody>
                     <div>
                       <span
@@ -47,6 +66,18 @@ class Blog extends Component {
                 </Card>
               ))}
         </div>
+
+        {this.state.user !== null ? (
+          <div name="buttons">
+            <Link to={"/" + this.props.match.params.blog_url + "/new"}>
+              <Button>New Post</Button>
+            </Link>
+
+            <Link to={"/"}>
+              <Button>Dashboard</Button>
+            </Link>
+          </div>
+        ) : null}
       </div>
     );
   }

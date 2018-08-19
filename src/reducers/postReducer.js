@@ -23,6 +23,17 @@ export default (state = initialState, action) => {
     case types.GET_POSTS_FAILURE:
       return state;
 
+      case types.GET_POST_REQUEST:
+      return state;
+
+    case types.GET_POST_SUCCESS:
+      return state.merge({
+        post: action.post
+      });
+
+    case types.GET_POST_FAILURE:
+      return state;
+
     default:
       return state;
   }

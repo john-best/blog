@@ -1,17 +1,18 @@
 import React, { Component } from "react";
 import firebase from "../server/firebase";
-
-let fakedata = [{
-      postid: 1,
-      title: "First post!",
-      content: "this is probably a good spot for markdown",
-      link: "/userid/postid",
-      date: "somesortofdatetime"
-}];
-
-
+import { bindActionCreators } from "redux";
+import { postActions } from "../actions/postActions";
+import { connect } from "react-redux";
+import { withRouter } from "react-router";
+import { Button, Card, CardHeader, CardBody } from "reactstrap";
+import { Link } from "react-router-dom";
+import marked from "marked";
 class Post extends Component {
-  componentWillMount() {
+  constructor() {
+    super();
+
+    this.state = {}
+
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.setState({ user: user });
@@ -20,21 +21,70 @@ class Post extends Component {
       }
     });
   }
+  componentDidMount() {
+    console.log(this.props.match.params);
+    this.props.actions.get_blog_post(
+      this.props.match.params.blog_url,
+      this.props.match.params.post_id
+    );
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    if (props.post !== state.post) return { post: props.post };
+    return null;
+  }
 
   render() {
-    return (
-      <div name="posts">
-        {fakedata.map((item, index) => 
-          <div key={"post-" + item.postid}>
-            <h1>
-              <a href={item.link}>{item.title}</a>
-            </h1>
-            <p>{item.content}</p>
-          </div>
-        )}
-      </div>
-    );
+    let post =
+      this.props.post !== undefined ? (
+        <Card>
+          <CardHeader>
+            <Link
+              to={
+                "/" +
+                this.props.match.params.blog_url +
+                "/post/" +
+                this.props.post.id
+              }
+            >
+              <h3>{this.props.post.title}</h3>
+            </Link>
+            <p>
+              <i>Posted on {this.props.post.posted_at}</i>
+            </p>
+          </CardHeader>
+          <CardBody>
+            <div>
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: marked(this.props.post.body, { sanitize: true })
+                }}
+              />
+            </div>
+          </CardBody>
+        </Card>
+      ) : null;
+    return <div name="post">{post}</div>;
   }
 }
 
-export default Post;
+function mapStateToProps(state, ownProps) {
+  console.log(state);
+  return {
+    post: state.postReducer.post
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators(postActions, dispatch)
+  };
+}
+
+const connectedPost = withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(Post)
+);
+export default connectedPost;

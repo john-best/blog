@@ -21,7 +21,8 @@ function new_blog(blog_url, blog_title) {
       .set({
         blog_title: blog_title,
         creator: auth.currentUser.uid,
-        posts: []
+        posts: [],
+        created_at: firebase.firestore.FieldValue.serverTimestamp()
       })
       .then(result => {
         db.collection("users")
@@ -70,6 +71,10 @@ function get_blogs() {
           let data = doc.data();
           let promises = [];
 
+          if (data.blogs === undefined) {
+            throw "No blogs found"
+          }
+
           for (var i = 0; i < data.blogs.length; i++) {
             let blog_ref = db.collection("blogs").doc(data.blogs[i]);
 
@@ -88,11 +93,12 @@ function get_blogs() {
             dispatch(success(my_blogs));
           });
         } else {
-          console.log("This user could not be found.");
+          throw "This user could not be found.";
         }
       })
       .catch(error => {
         console.log(error);
+        dispatch(failure(error))
       });
   };
 

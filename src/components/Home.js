@@ -5,6 +5,7 @@ import { blogActions } from "../actions/blogActions";
 import { connect } from "react-redux";
 import { withRouter } from "react-router";
 import {
+  Alert,
   Button,
   Card,
   CardBody,
@@ -25,7 +26,8 @@ class Home extends Component {
     this.state = {
       modal: false,
       blog_title: "",
-      blog_url: ""
+      blog_url: "",
+      alert: ""
     };
 
     this.create_blog = this.create_blog.bind(this);
@@ -45,10 +47,26 @@ class Home extends Component {
   static getDerivedStateFromProps(props, state) {
     if (props.blogs !== state.blogs) return { blogs: props.blogs };
     return null;
-}
+  }
 
   create_blog() {
-    this.props.blog_actions.new_blog(this.state.blog_title, this.state.blog_url);
+    if (/\s/.test(this.state.blog_url)) {
+      this.setState({ alert: "You cannot have spaces in your blog url!" });
+      return;
+    }
+
+    if (
+      this.state.blog_url.length === 0 ||
+      this.state.blog_title.length === 0
+    ) {
+      this.setState({ alert: "Both fields are required." });
+      return;
+    }
+
+    this.props.blog_actions.new_blog(
+      this.state.blog_title,
+      this.state.blog_url
+    );
     //this.toggle();
   }
 
@@ -71,8 +89,11 @@ class Home extends Component {
             toggle={this.toggle}
             className={this.props.className}
           >
-            <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
+            <ModalHeader toggle={this.toggle}>Create New Blog</ModalHeader>
             <ModalBody>
+              {this.state.alert !== "" ? (
+                <Alert color="danger">{this.state.alert}</Alert>
+              ) : null}
               <FormGroup>
                 <Label for="blog_title">Blog Name</Label>
                 <Input
