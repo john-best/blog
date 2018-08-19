@@ -9,7 +9,7 @@ export const blogActions = { new_blog, get_blogs };
 let db = firebase.firestore();
 let auth = firebase.auth();
 
-function new_blog(blog_link, blog_title) {
+function new_blog(blog_url, blog_title) {
   return dispatch => {
     dispatch(request());
 
@@ -17,20 +17,21 @@ function new_blog(blog_link, blog_title) {
     // then add the blog link (which is unique key) to the array of blogs for the user
     // since the blog creation is now finished, push them to the newly created blog page
     db.collection("blogs")
-      .doc(blog_link)
+      .doc(blog_url)
       .set({
         blog_title: blog_title,
-        creator: auth.currentUser.uid
+        creator: auth.currentUser.uid,
+        posts: []
       })
       .then(result => {
         db.collection("users")
           .doc(auth.currentUser.uid)
           .update({
-            blogs: firebase.firestore.FieldValue.arrayUnion(blog_link)
+            blogs: firebase.firestore.FieldValue.arrayUnion(blog_url)
           })
           .then(result => {
             dispatch(success());
-            history.push("/" + blog_link);
+            history.push("/" + blog_url);
           });
       })
       .catch(error => {
@@ -72,11 +73,11 @@ function get_blogs() {
           for (var i = 0; i < data.blogs.length; i++) {
             let blog_ref = db.collection("blogs").doc(data.blogs[i]);
 
-            let blog_link = data.blogs[i];
+            let blog_url = data.blogs[i];
             promises.push(
               blog_ref.get().then(doc => {
                 my_blogs.push({
-                  blog_link: blog_link,
+                  blog_url: blog_url,
                   blog_title: doc.data().blog_title
                 });
               })

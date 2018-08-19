@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import firebase from "../server/firebase";
 
-let fakedata = {
+let fakedata = [{
       postid: 1,
       title: "First post!",
       content: "this is probably a good spot for markdown",
       link: "/userid/postid",
       date: "somesortofdatetime"
-};
+}];
 
 
 class Post extends Component {
@@ -24,7 +24,7 @@ class Post extends Component {
   render() {
     return (
       <div name="posts">
-        {fakedata.posts.map((item, index) => 
+        {fakedata.map((item, index) => 
           <div key={"post-" + item.postid}>
             <h1>
               <a href={item.link}>{item.title}</a>

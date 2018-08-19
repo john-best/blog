@@ -24,8 +24,8 @@ class Home extends Component {
 
     this.state = {
       modal: false,
-      blog_link: "",
-      blog_name: ""
+      blog_title: "",
+      blog_url: ""
     };
 
     this.create_blog = this.create_blog.bind(this);
@@ -48,7 +48,7 @@ class Home extends Component {
 }
 
   create_blog() {
-    this.props.blog_actions.new_blog(this.state.blog_link, this.state.blog_name);
+    this.props.blog_actions.new_blog(this.state.blog_title, this.state.blog_url);
     //this.toggle();
   }
 
@@ -74,20 +74,20 @@ class Home extends Component {
             <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
             <ModalBody>
               <FormGroup>
-                <Label for="blog_name">Blog Name</Label>
+                <Label for="blog_title">Blog Name</Label>
                 <Input
                   placeholder="John's Blog"
                   type="text"
-                  name="blog_name"
+                  name="blog_title"
                   onChange={this.changeEvent}
                 />
               </FormGroup>
               <FormGroup>
-                <Label for="blog_link">Blog URL</Label>
+                <Label for="blog_url">Blog URL</Label>
                 <Input
                   placeholder="johns_blog"
                   type="text"
-                  name="blog_link"
+                  name="blog_url"
                   onChange={this.changeEvent}
                 />
               </FormGroup>
@@ -108,7 +108,7 @@ class Home extends Component {
                 <Card key={index}>
                   <CardBody>
                     <h1>
-                      <a href={blog.blog_link}>{blog.blog_title}</a>
+                      <a href={blog.blog_url}>{blog.blog_title}</a>
                     </h1>
                   </CardBody>
                 </Card>

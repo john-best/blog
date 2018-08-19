@@ -51,7 +51,7 @@ class NewPost extends Component {
   }
 
   post() {
-    console.log("TODO");
+    this.props.actions.new_post(this.props.match.params.blog_url, this.state.title, this.state.content);
   }
 
   preview() {

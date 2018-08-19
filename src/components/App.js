@@ -6,6 +6,7 @@ import Login from "./Login";
 import NewPost from "./NewPost";
 import Blog from "./Blog";
 import history from "../history";
+import Post from "./Post";
 
 class App extends Component {
   render() {
@@ -15,8 +16,9 @@ class App extends Component {
           <Switch>
             <Route exact path="/" component={Home} />
             <Route exact path="/login" component={Login} />
-            <Route exact path="/:blog_name/newpost" component={NewPost} />
-            <Route exact path="/:blog_name" component={Blog} />
+            <Route exact path="/:blog_url/new" component={NewPost} />
+            <Route exact path="/:blog_url" component={Blog} />
+            <Route exact path="/:blog_url/post/:post_id" component={Post} />
           </Switch>
         </Router>
       </div>
