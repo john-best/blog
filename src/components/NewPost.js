@@ -13,6 +13,7 @@ import {
 } from "reactstrap";
 import { bindActionCreators } from "redux";
 import { postActions } from "../actions/postActions";
+import { blogActions } from "../actions/blogActions";
 import { connect } from "react-redux";
 import { withRouter } from "react-router";
 import firebase from "../server/firebase";
@@ -45,7 +46,7 @@ class NewPost extends Component {
   }
 
   componentDidMount() {
-    // TODO: check if user has access to blog to even post
+    this.props.blogActions.check_edit_privs_redirect(this.props.match.params.blog_url);
   }
 
   changeEvent(e) {
@@ -115,10 +116,10 @@ class NewPost extends Component {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(postActions, dispatch)
+    actions: bindActionCreators(postActions, dispatch),
+    blogActions: bindActionCreators(blogActions, dispatch)
   };
 }
-
 const connectedNewPost = withRouter(
   connect(
     null,
