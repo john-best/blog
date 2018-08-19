@@ -34,6 +34,7 @@ class EditPost extends Component {
     this.changeEvent = this.changeEvent.bind(this);
     this.edit = this.edit.bind(this);
     this.preview = this.preview.bind(this);
+    this.delete = this.delete.bind(this);
 
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
@@ -62,6 +63,10 @@ class EditPost extends Component {
 
   edit() {
     this.props.actions.edit_post(this.props.match.params.blog_url, this.props.match.params.post_id, this.state.title, this.state.body);
+  }
+
+  delete() {
+      this.props.actions.delete_post(this.props.match.params.blog_url, this.props.match.params.post_id);
   }
 
   preview() {
@@ -100,10 +105,14 @@ class EditPost extends Component {
             Save Changes
           </Button>
           <Button
-            style={{ marginLeft: "0.25%", marginTop: "2%" }}
+            style={{ marginRight: "0.125%", marginLeft: "0.125%", marginTop: "2%" }}
           onClick={this.preview}>
             Preview
           </Button>
+          <Button
+            style={{ marginLeft: "0.25%", marginTop: "2%" }}
+            onClick={this.delete} color="danger"
+          >Delete Post</Button>
         </Form>
 
         {this.state.preview ? (

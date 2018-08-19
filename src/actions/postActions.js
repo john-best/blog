@@ -7,7 +7,13 @@ import history from "../history";
 let auth = firebase.auth();
 let db = firebase.firestore();
 
-export const postActions = { new_post, get_blog_posts, get_blog_post, edit_post };
+export const postActions = {
+  new_post,
+  get_blog_posts,
+  get_blog_post,
+  edit_post,
+  delete_post
+};
 
 function new_post(blog_url, title, body) {
   return dispatch => {
@@ -110,17 +116,16 @@ function get_blog_post(blog_url, post_id) {
     post_ref
       .get()
       .then(doc => {
-
         let post = doc.data();
 
-        let returnval = {
-          
-        }
-        dispatch(success({
-          ...post,
-          posted_at: post.posted_at.toDate().toString(),
-          id: post_id
-        }));
+        let returnval = {};
+        dispatch(
+          success({
+            ...post,
+            posted_at: post.posted_at.toDate().toString(),
+            id: post_id
+          })
+        );
       })
       .catch(error => {
         dispatch(failure(error));
@@ -142,23 +147,24 @@ function get_blog_post(blog_url, post_id) {
 
 function edit_post(blog_url, post_id, title, body) {
   return dispatch => {
-    dispatch(request())
+    dispatch(request());
 
-    console.log(post_id);
     let post_ref = db.collection("posts").doc(post_id);
-    post_ref.update({
-      title: title,
-      body: body,
-      updated_at: firebase.firestore.FieldValue.arrayUnion(post_id)
-    }).then(result => {
-      dispatch(success());
-      history.push("/" + blog_url + "/post/" + post_id);
-    }).catch(error => {
-
-      console.log(error);
-      dispatch(failure(error));
-    })
-  }
+    post_ref
+      .update({
+        title: title,
+        body: body,
+        updated_at: firebase.firestore.FieldValue.arrayUnion(post_id)
+      })
+      .then(result => {
+        dispatch(success());
+        history.push("/" + blog_url + "/post/" + post_id);
+      })
+      .catch(error => {
+        console.log(error);
+        dispatch(failure(error));
+      });
+  };
   function request() {
     return { type: types.EDIT_POST_REQUEST };
   }
@@ -170,5 +176,40 @@ function edit_post(blog_url, post_id, title, body) {
   function failure(error) {
     return { type: types.EDIT_POST_FAILURE, error: error };
   }
+}
 
+function delete_post(blog_url, post_id) {
+  return dispatch => {
+    dispatch(request());
+
+    let blog_ref = db.collection("blogs").doc(blog_url);
+
+    blog_ref
+      .update({
+        posts: firebase.firestore.FieldValue.arrayRemove(post_id)
+      })
+      .then(() => {
+        db.collection("posts")
+          .doc(post_id)
+          .delete()
+          .then(() => {
+            dispatch(success());
+            history.push("/" + blog_url);
+          });
+      })
+      .catch(error => {
+        dispatch(failure(error));
+      });
+  };
+  function request() {
+    return { type: types.DELETE_POST_REQUEST };
+  }
+
+  function success() {
+    return { type: types.DELETE_POST_SUCCESS };
+  }
+
+  function failure(error) {
+    return { type: types.DELETE_POST_FAILURE, error: error };
+  }
 }
