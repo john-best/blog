@@ -49,7 +49,7 @@ class Blog extends Component {
           {this.state.posts === undefined
             ? "Loading..."
             : this.state.posts.map((item, index) => (
-                <Card key={index} style={{ marginBottom: "2em" }}>
+                <Card key={index} style={{ marginBottom: "0.5em", marginTop: "0.5em" }}>
                   <CardHeader>
                     <Link
                       to={

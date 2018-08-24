@@ -37,7 +37,7 @@ class Post extends Component {
   render() {
     let post =
       this.props.post !== undefined ? (
-        <Card>
+        <Card style={{marginTop: "0.5em", marginBottom: "0.5em"}}>
           <CardHeader>
             <Link
               to={

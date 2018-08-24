@@ -7,6 +7,7 @@ import { withRouter } from "react-router";
 import {
   Alert,
   Button,
+  ButtonGroup,
   Card,
   CardBody,
   Input,
@@ -124,20 +125,23 @@ class Home extends Component {
           </Modal>
         </div>
         <div name="blogs">
+        <h1 style={{marginTop: "0.5em", marginBottom: "0.5em"}}> Your Blogs </h1>
           {this.props.blogs !== undefined
             ? this.props.blogs.map((blog, index) => (
                 <Card key={index}>
                   <CardBody>
-                    <h1>
+                    <h2>
                       <a href={blog.blog_url}>{blog.blog_title}</a>
-                    </h1>
+                    </h2>
                   </CardBody>
                 </Card>
               ))
             : null}
 
-          <Button onClick={this.toggle}>Create New Blog</Button>
-          <Button onClick={this.props.auth_actions.logout}>Logout</Button>
+          <ButtonGroup style={{ marginTop: "0.5em"}}>
+            <Button onClick={this.toggle}>Create New Blog</Button>
+            <Button onClick={this.props.auth_actions.logout}>Logout</Button>
+          </ButtonGroup>
         </div>
       </div>
     );
