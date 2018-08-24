@@ -68,7 +68,6 @@ class Home extends Component {
       this.state.blog_title,
       this.state.blog_url
     );
-    //this.toggle();
   }
 
   toggle() {

@@ -9,7 +9,7 @@ export const blogActions = { new_blog, get_blogs, check_edit_privs, check_edit_p
 let db = firebase.firestore();
 let auth = firebase.auth();
 
-function new_blog(blog_url, blog_title) {
+function new_blog(blog_title, blog_url) {
   return dispatch => {
     dispatch(request());
 
