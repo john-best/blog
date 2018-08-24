@@ -19,12 +19,12 @@ class Blog extends Component {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.setState({ user: user });
-        this.props.blogActions.check_edit_privs(
+        this.props.blogActions.get_blog_settings(
           this.props.match.params.blog_url
         );
       } else {
         this.setState({ user: null });
-        this.props.blogActions.check_edit_privs(
+        this.props.blogActions.get_blog_settings(
           this.props.match.params.blog_url
         );
       }
@@ -37,14 +37,13 @@ class Blog extends Component {
 
   static getDerivedStateFromProps(props, state) {
     if (props.posts !== state.posts) return { posts: props.posts };
-    if (props.user_can_edit !== state.user_can_edit)
-      return { user_can_edit: props.user_can_edit };
     return null;
   }
 
   render() {
     return (
       <div>
+        <h2>{this.props.blog_name}</h2>
         <div name="posts">
           {this.state.posts === undefined
             ? "Loading..."
@@ -94,7 +93,8 @@ function mapStateToProps(state, ownProps) {
   console.log(state);
   return {
     posts: state.postReducer.posts,
-    user_can_edit: state.blogReducer.user_can_edit
+    user_can_edit: state.blogReducer.user_can_edit,
+    blog_name: state.blogReducer.blog_name
   };
 }
 

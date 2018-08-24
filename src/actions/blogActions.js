@@ -4,7 +4,7 @@ import "firebase/auth";
 import firebase from "../server/firebase";
 import history from "../history";
 
-export const blogActions = { new_blog, get_blogs, check_edit_privs, check_edit_privs_redirect };
+export const blogActions = { new_blog, get_blogs, get_blog_settings, check_edit_privs_redirect };
 
 let db = firebase.firestore();
 let auth = firebase.auth();
@@ -115,7 +115,7 @@ function get_blogs() {
   }
 }
 
-function check_edit_privs(blog_id) {
+function get_blog_settings(blog_id) {
   return dispatch => {
     dispatch(request())
 
@@ -124,15 +124,15 @@ function check_edit_privs(blog_id) {
       dispatch(success(false));
       return;
     }
-    let user_ref = db.collection("users").doc(auth.currentUser.uid);
-    user_ref.get().then(doc => {
+    let blog_ref = db.collection("blogs").doc(blog_id);
+    blog_ref.get().then(doc => {
       let data = doc.data();
 
-      // if blog is within user's created blogs array
-      if (data.blogs.indexOf(blog_id) !== -1) {
-        dispatch(success(true));
+      // if the blog owner is the current user...
+      if (data.creator === auth.currentUser.uid) {
+        dispatch(success(true, data.blog_title));
       } else {
-        dispatch(success(false));
+        dispatch(success(false, data.blog_title));
       }
 
     }).catch(error => {
@@ -145,13 +145,13 @@ function check_edit_privs(blog_id) {
     return { type: types.CHECK_EDIT_PRIVS_REQUEST };
   }
 
-  function success(bool) {
-    return { type: types.CHECK_EDIT_PRIVS_SUCCESS, user_can_edit: bool };
+  function success(bool, blog_name) {
+    return { type: types.CHECK_EDIT_PRIVS_SUCCESS, user_can_edit: bool, blog_name: blog_name };
   }
 
   function failure(error) {
     // if there's an error let's just not let them edit
-    return { type: types.CHECK_EDIT_PRIVS_FAILURE, user_can_edit: false, error: error };
+    return { type: types.CHECK_EDIT_PRIVS_FAILURE, user_can_edit: false, error: error, blog_name: "" };
   }
 }
 

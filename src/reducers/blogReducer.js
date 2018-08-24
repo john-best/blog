@@ -32,7 +32,8 @@ export default (state = initialState, action) => {
 
     case types.CHECK_EDIT_PRIVS_SUCCESS:
       return state.merge({
-        user_can_edit: action.user_can_edit
+        user_can_edit: action.user_can_edit,
+        blog_name: action.blog_name
       });
 
     case types.CHECK_EDIT_PRIVS_FAILURE:
