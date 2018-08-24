@@ -13,6 +13,7 @@ import {
 } from "reactstrap";
 import { bindActionCreators } from "redux";
 import { postActions } from "../actions/postActions";
+import { blogActions } from "../actions/blogActions";
 import { connect } from "react-redux";
 import { withRouter } from "react-router";
 import firebase from "../server/firebase";
@@ -141,7 +142,8 @@ function mapStateToProps(state, ownProps) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(postActions, dispatch)
+    actions: bindActionCreators(postActions, dispatch),
+    blogActions: bindActionCreators(blogActions, dispatch)
   };
 }
 
