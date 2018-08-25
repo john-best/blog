@@ -119,7 +119,8 @@ function get_blog_settings(blog_id) {
   return dispatch => {
     dispatch(request())
 
-    
+    // get blog settings
+    // right now: the blog name and if the user is the blog creator
     if (auth.currentUser === null) {
       dispatch(success(false));
       return;
@@ -159,6 +160,7 @@ function check_edit_privs_redirect(user_id, blog_id) {
   return dispatch => {
     dispatch(request())
 
+    // redirects you back a page if you do not have access to these pages
     let blog_ref = db.collection("blogs").doc(blog_id);
     blog_ref.get().then(doc => {
       let data = doc.data();
@@ -167,12 +169,12 @@ function check_edit_privs_redirect(user_id, blog_id) {
         dispatch(success(true));
       } else {
         dispatch(success(false));
-        history.push("/");
+        history.goBack();
       }
 
     }).catch(error => {
       dispatch(failure(error));
-      history.push("/");
+      history.goBack();
     })
 
   }

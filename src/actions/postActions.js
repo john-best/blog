@@ -19,6 +19,7 @@ function new_post(blog_url, title, body) {
   return dispatch => {
     dispatch(request());
 
+    // add post to posts collection, then append the postid to the creator's posts array
     db.collection("posts")
       .add({
         title: title,
@@ -61,6 +62,7 @@ function get_blog_posts(blog_url) {
   return dispatch => {
     dispatch(request());
 
+    // get all posts from blog, starting from the end since we always append newest posts
     let blog_ref = db.collection("blogs").doc(blog_url);
 
     blog_ref
@@ -74,6 +76,7 @@ function get_blog_posts(blog_url) {
           let post_ref = db.collection("posts").doc(data.posts[i]);
           let post_id = data.posts[i];
 
+          // concurrency is fun i think this is how you do it
           promises.push(
             post_ref.get().then(doc => {
               let post = doc.data();
@@ -112,6 +115,8 @@ function get_blog_post(blog_url, post_id) {
   return dispatch => {
     dispatch(request());
 
+    // get a specific blog post
+    // do we even need blog_url in this case?? since we can just grab the post via id
     let post_ref = db.collection("posts").doc(post_id);
     post_ref
       .get()
@@ -148,6 +153,7 @@ function edit_post(blog_url, post_id, title, body) {
   return dispatch => {
     dispatch(request());
 
+    // edits the post given the post_id with the newly updated title and body
     let post_ref = db.collection("posts").doc(post_id);
     post_ref
       .update({
@@ -181,6 +187,7 @@ function delete_post(blog_url, post_id) {
   return dispatch => {
     dispatch(request());
 
+    // delete a post from the collection and then also remove it from the posts array in the given blog
     let blog_ref = db.collection("blogs").doc(blog_url);
 
     blog_ref

@@ -14,6 +14,7 @@ function login(email, password) {
   return dispatch => {
     dispatch(request());
 
+    // firebase login w/ email+password
     auth
       .signInWithEmailAndPassword(email, password)
       .then(result => {
@@ -41,6 +42,8 @@ function login(email, password) {
 function register(email, password) {
   return dispatch => {
     dispatch(request());
+
+    // firebase create w/ email+password
     auth
       .createUserWithEmailAndPassword(email, password)
       .then(result => {
@@ -50,7 +53,6 @@ function register(email, password) {
           })
           .then(result => {
             dispatch(success());
-            console.log("lmao");
           });
       })
       .catch(error => {
