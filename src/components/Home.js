@@ -34,20 +34,20 @@ class Home extends Component {
     this.create_blog = this.create_blog.bind(this);
     this.toggle = this.toggle.bind(this);
     this.changeEvent = this.changeEvent.bind(this);
-
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        this.setState({ user: user });
-        this.props.blog_actions.get_blogs();
-      } else {
-        this.setState({ user: null });
-      }
-    });
   }
 
   static getDerivedStateFromProps(props, state) {
     if (props.blogs !== state.blogs) return { blogs: props.blogs };
     return null;
+  }
+
+  componentDidMount() {
+    if (this.props.user === null) {
+      this.props.history.push("/login");
+    }
+    this.setState({
+      user: this.props.user
+    });
   }
 
   create_blog() {
@@ -124,7 +124,10 @@ class Home extends Component {
           </Modal>
         </div>
         <div name="blogs">
-        <h1 style={{marginTop: "0.5em", marginBottom: "0.5em"}}> Your Blogs </h1>
+          <h1 style={{ marginTop: "0.5em", marginBottom: "0.5em" }}>
+            {" "}
+            Your Blogs{" "}
+          </h1>
           {this.props.blogs !== undefined
             ? this.props.blogs.map((blog, index) => (
                 <Card key={index}>
@@ -137,7 +140,7 @@ class Home extends Component {
               ))
             : null}
 
-          <ButtonGroup style={{ marginTop: "0.5em"}}>
+          <ButtonGroup style={{ marginTop: "0.5em" }}>
             <Button onClick={this.toggle}>Create New Blog</Button>
             <Button onClick={this.props.auth_actions.logout}>Logout</Button>
           </ButtonGroup>

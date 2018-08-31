@@ -17,7 +17,8 @@ class App extends Component {
         <Router history={history}>
           <Switch>
             <Route exact path="/" render={props => <BlogWrapper {...props} rendering={Home} />} />
-            <Route exact path="/login" component={Login} />
+            <Route exact path="/login" render={props => <Login {...props} isLogout={false} />} />
+            <Route exact path="/logout" render={props => <Login {...props} isLogout={true} />} />
             <Route exact path="/:blog_url/new" render={props => <BlogWrapper {...props} rendering={NewPost} />} />
             <Route exact path="/:blog_url" render={props => <BlogWrapper {...props} rendering={Blog} />} />
             <Route exact path="/:blog_url/post/:post_id" render={props => <BlogWrapper {...props} rendering={Post} />} />

@@ -28,12 +28,14 @@ class Login extends Component {
     this.onKeyPress = this.onKeyPress.bind(this);
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
+    this.logout = this.logout.bind(this);
+  }
 
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        this.props.history.push("/");
-      }
-    });
+  componentDidMount() {
+    console.log(this.props)
+    if (this.props.isLogout === true) {
+      this.logout();
+    }
   }
 
   changeEvent(e) {
@@ -53,6 +55,10 @@ class Login extends Component {
   register() {
     this.props.actions.register(this.state.email, this.state.password);
     // TODO: new modal for registration to confirm password and other requirements...
+  }
+
+  logout() {
+    this.props.actions.logout();
   }
 
   render() {

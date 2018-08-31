@@ -1,12 +1,33 @@
 import React, { Component } from "react";
-import Home from "./Home";
-import { Navbar, NavbarBrand, Container } from "reactstrap";
-
+import { Navbar, NavbarBrand, NavLink, Nav, NavItem, Container } from "reactstrap";
 import { Link } from "react-router-dom";
+import { bindActionCreators } from "redux";
+import { authActions } from "../actions/authActions";
+import { connect } from "react-redux";
+import { withRouter } from "react-router";
+import firebase from "../server/firebase";
 
 class BlogWrapper extends Component {
   constructor() {
     super();
+
+    this.state = {
+      user: null,
+    }
+    
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.setState({ user: user });
+      } else {
+        this.setState({ user: null });
+      }
+    });
+
+    this.logout = this.logout.bind(this);
+  }
+
+  logout() {
+    this.props.actions.logout()
   }
 
   render() {
@@ -24,12 +45,31 @@ class BlogWrapper extends Component {
             >
               Blog(tm)
             </NavbarBrand>
+
+            <Nav className="ml-auto" navbar>
+              <NavItem>
+                {this.state.user !== null ? <NavLink tag={Link} to={"/logout"} >Logout</NavLink> : <NavLink tag={Link} to={"/login"}>Login</NavLink>}
+              </NavItem>
+            </Nav>
           </Navbar>
-          <this.props.rendering />
+          <this.props.rendering user={this.state.user} />
         </Container>
       </div>
     );
   }
 }
 
-export default BlogWrapper;
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators(authActions, dispatch),
+  };
+}
+
+const connectedBlogWrapper = withRouter(
+  connect(
+    null,
+    mapDispatchToProps
+  )(BlogWrapper)
+);
+export default connectedBlogWrapper;
